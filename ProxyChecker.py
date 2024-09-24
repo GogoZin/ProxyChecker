@@ -1,9 +1,9 @@
 import ssl
-import socks
 import socket
 import requests
 import threading
 from bs4 import BeautifulSoup
+
      #############################################
     ###   Super Proxy Checker Code By GogoZin   ###
    ### This script can check a proxy list of 50k ###
@@ -11,8 +11,8 @@ from bs4 import BeautifulSoup
    ### make it the most efficient proxy checker  ###
     ###           on the Internet               ###
      #############################################
+
 conns = 0
-proxy_file = "http.txt" # Proxy.txt 
 delay = 5 # timeout for proxy check
 pro = [] # proxy list by scraper
 target_port = 443 # you can change it for your target port which used
@@ -27,7 +27,7 @@ URL = ['https://www.free-proxy-list.net/', # proxy page for Scraper_2
 
 
 
-def checkingBySocket(proxy): # Check HTTP Proxies By Socket
+def checkingBySocket(proxy): # Check HTTP Proxy's Connection Using Socket, Credit&Logic By GogoZin
     global conns
     try:
         proxy_ip, proxy_port = proxy.split(":") # Try split proxy_ip&port
@@ -99,9 +99,10 @@ def proxyScrape(): # Scraper_1
             pass
         else:
             pro.append(lines)
+    print(f"Fetch Proxy From https://api.proxyscrape.com/")
 
 
-def fetch_proxies(url): # Scraper_2
+def fetch_proxies(url): # Scraper_2 Code By GogoZin
     try:
         # send request to proxy website
         response = requests.get(url)
@@ -110,7 +111,7 @@ def fetch_proxies(url): # Scraper_2
         # find proxy table
         table = soup.find('table', {'class': 'table'})
         if not table:
-            print('代理列表表格未找到')
+            print('Table Not Found !')
             return pro
         
         # find all proxy and add to list
@@ -123,34 +124,60 @@ def fetch_proxies(url): # Scraper_2
                 pro.append(proxy)
 
     except Exception as e:
-        print(f"發生錯誤: {e}")
+        print(f"Error : {e}")
+    print(f"Fetch Proxy From {url}")
+
+
+def fetch_github(): # Scraper_3
+    git_proxy_list = [
+            "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/http.txt",
+            "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt",
+            "https://raw.githubusercontent.com/mmpx12/proxy-list/refs/heads/master/http.txt",
+            "https://raw.githubusercontent.com/mmpx12/proxy-list/refs/heads/master/https.txt",
+            "https://raw.githubusercontent.com/zevtyardt/proxy-list/refs/heads/main/http.txt",
+            "https://raw.githubusercontent.com/ALIILAPRO/Proxy/refs/heads/main/http.txt",
+            "https://raw.githubusercontent.com/MuRongPIG/Proxy-Master/main/http.txt",
+            "https://raw.githubusercontent.com/sunny9577/proxy-scraper/refs/heads/master/generated/http_proxies.txt",
+            "https://raw.githubusercontent.com/Zaeem20/FREE_PROXIES_LIST/refs/heads/master/http.txt",
+            "https://raw.githubusercontent.com/Zaeem20/FREE_PROXIES_LIST/refs/heads/master/https.txt",
+            "https://raw.githubusercontent.com/roosterkid/openproxylist/refs/heads/main/HTTPS_RAW.txt",
+            "https://raw.githubusercontent.com/elliottophellia/proxylist/refs/heads/master/results/http/global/http_checked.txt",
+    ]
+
+    for u in git_proxy_list:
+        r = requests.get(u)
+        lst = r.text.split("\n")
+        for lines in lst:
+            if len(lines) < 10:
+                pass
+            else:
+                pro.append(lines)
+        u_path = u.split(".com/")[1]
+        print(f"Fetch From Github:{u_path}")
 
 
 def save_proxies(): # for saving alive proxies to .txt
     with open("online_http.txt", 'w') as f:
         for p in alive_proxy:
             f.write(p + '\n')
-    print(f"活躍代理已保存到 online_http.txt")
+    print(f"Alive Proxies Save As online_http.txt")
 
     with open("online_https.txt", 'w') as fs:
         for ps in alive_proxy_ssl:
             fs.write(ps + '\n')
-    print(f"支援TLS/SSL代理已保存到 online_https.txt")
+    print(f"TLS/SSL Proxies Save As online_https.txt")
 
 
 if __name__ == "__main__":
     proxyScrape() # Scraper_1
+    fetch_github() # Scraper_3
     for u in URL:
         fetch_proxies(u) # Scraper_2
-    proxy_lst = open(proxy_file).readlines() # open default proxy list and read
-    for p in sorted(set(proxy_lst)): # sorted and remove some lines 
-        if len(p) < 10 or len(p) > 22:
-            pass
-        else:
-            pro.append(p)
     pro = sorted(set(pro))
     checkProxies()
-    print(f"抓取代理數量 : {len(pro)}") # total downloaded proxy 
-    print(f"活躍代理數量 : {len(alive_proxy)}") # total alive proxy
-    print(f"支援TLS/SSL代理數量 : {len(alive_proxy_ssl)}") # total alive proxy that support TLS/SSL proto
+    print(f"Fetch Proxies : {len(pro)}") # total downloaded proxy 
+    print(f"Alive Proxies : {len(alive_proxy)}") # total alive proxy
+    print(f"TLS/SSL Proxies : {len(alive_proxy_ssl)}") # total alive proxy that support TLS/SSL proto
     save_proxies() # save proxies to .txt list
+
+    # Python Fast Http Proxy Checker, Code By GogoZin 
